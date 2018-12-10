@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:english_words/english_words.dart';
 
 void main() => runApp(MyApp());
 
@@ -25,13 +26,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
+    final _suggestions = <WordPair>[];
+    final _biggerFont = const TextStyle(fontSize: 18.0);
 
   @override
   Widget build(BuildContext context) {
@@ -39,25 +35,32 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.display1,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      body: _buildSuggestions(),
     );
   }
+
+    Widget _buildSuggestions() {
+        return ListView.builder(
+                padding: const EdgeInsets.all(16.0),
+                itemBuilder: (context, i) {
+                    // Add a one-pixel-high divider widget before each row in theListView.
+                    if (i.isOdd) return Divider();
+
+                    final index = i ~/ 2;
+                    if (index >= _suggestions.length) {
+                        _suggestions.addAll(generateWordPairs().take(10));
+                    }
+                    return _buildRow(_suggestions[index]);
+                });
+    }
+
+    Widget _buildRow(WordPair pair) {
+        return ListTile(
+            title: Text(
+                pair.asPascalCase,
+                style: _biggerFont,
+            ),
+        );
+    }
+
 }
