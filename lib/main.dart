@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:english_words/english_words.dart';
 import 'dart:async';
 import 'dart:io';
-import 'dart:convert';
+import 'dart:convert' as JSON;
 import 'package:path_provider/path_provider.dart';
 import 'data.dart';
 import 'user.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
 void main() => runApp(MyApp());
 
@@ -32,14 +33,22 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-    final users = new List<User>();
+    List<User> users = new List<User>();
     final _suggestions = <WordPair>[];
     final _biggerFont = const TextStyle(fontSize: 18.0);
 
   @override
   Widget build(BuildContext context) {
-    var data = loadData().then(data);
-    users.add(data.);
+    if (users.length == 0) {
+        loadData().then((result) {
+            users = new List.from(users)
+                ..addAll(result);
+            _suggestions.clear();
+            users.forEach((user) => _suggestions.add(new WordPair(user.last_name, user.first_name)));
+            print("\n\n\nDONE\n\n\n");
+            print("users: " + users.length.toString());
+        });
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -76,53 +85,22 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-Future<String> get _localPath async {
-  final directory = await getApplicationDocumentsDirectory();
-
-  return directory.path;
-}
-
-Future<File> get _localFile async {
-  final path = await _localPath;
-  return File('$path/data/data.json');
+Future<String> getFileData(String path) async {
+    return await rootBundle.loadString(path);
 }
 
 Future<List<User>> loadData() async {
   try {
-    final file = await _localFile;
-    String contents = await file.readAsString();
-    Data data = json.decode(contents);
+    String contents = await getFileData('data/data.json');
+
+    final json = JSON.json.decode(contents);
+    Data data = Data.fromJson(json);
+//    print("data: "+data.colleges.length.toString());
+    print("data: "+data.colleges.length.toString());
+
     return data.colleges;
   } catch (e) {
+      print(e);
     return new List();
   }
 }
-
-//Future<int> fetchSavedItemNo() async { // you need to return a Future to the FutureBuilder
-//    Future<Directory> dir = getApplicationDocumentsDirectory();
-//    File jsonFile = new File(dir.path+ "/" + fileName);
-//    bool fileExists = jsonFile.existsSync();
-//
-//    int itemNo;
-//    // you should also not set state because the FutureBuilder will take care of that
-//    if (fileExists)
-//        itemNo = json.decode(jsonFile.readAsStringSync())['item'];
-//
-//    itemNo ??= 0; // this is a great null-aware operator, which assigns 0 if itemNo is null
-//
-//    return itemNo;
-//}
-//
-//@override
-//Widget build(BuildContext context) {
-//    return FutureBuilder<int>(
-//        future: fetchSavedItemNo(),
-//        builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
-//            if (snapshot.connectionState == ConnectionState.done) {
-//                print('itemNo in FutureBuilder: ${snapshot.data}';
-//                        return Text('Hello');
-//            } else
-//                return Text('Loading...');
-//        },
-//    );
-//}
