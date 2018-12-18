@@ -8,7 +8,15 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'data.dart';
 import 'user.dart';
 
-void main() => runApp(MyApp());
+Future<void> main() async {
+    var list = await loadData();
+    DataHolder.users = list;
+    runApp(MyApp());
+}
+
+class DataHolder {
+    static List<User> users;
+}
 
 class MyApp extends StatelessWidget {
     @override
@@ -33,22 +41,12 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-    List<User> users = new List<User>();
+    List<User> _users = DataHolder.users;
     final _suggestions = <WordPair>[];
     final _biggerFont = const TextStyle(fontSize: 18.0);
 
     @override
     Widget build(BuildContext context) {
-        if (users.length == 0) {
-            loadData().then((result) {
-                users = new List.from(users)
-                    ..addAll(result);
-                _suggestions.clear();
-                users.forEach((user) => _suggestions.add(new WordPair(user.last_name, user.first_name)));
-                print("\n\n\nDONE\n\n\n");
-                print("users: " + users.length.toString());
-            });
-        }
 
         return Scaffold(
             appBar: AppBar(
@@ -65,11 +63,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     // Add a one-pixel-high divider widget before each row in theListView.
                     if (i.isOdd) return Divider();
 
-                    var data = loadData();
-
                     final index = i ~/ 2;
                     if (index >= _suggestions.length) {
-                        _suggestions.addAll(generateWordPairs().take(10));
+                        var toAdd = _users.getRange(index, index + 10).map((user) => new WordPair(user.last_name, user.first_name));
+                        _suggestions.addAll(toAdd);
                     }
                     return _buildRow(_suggestions[index]);
                 });
@@ -95,7 +92,6 @@ Future<List<User>> loadData() async {
 
         final json = JSON.json.decode(contents);
         Data data = Data.fromJson(json);
-//    print("data: "+data.colleges.length.toString());
         print("data: " + data.colleges.length.toString());
 
         return data.colleges;
