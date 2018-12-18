@@ -42,6 +42,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
 //    List<User> _users = DataHolder.users;
     final _users = DataHolder.users;
+    final Set<User> _saved = new Set<User>();
     final _biggerFont = const TextStyle(fontSize: 18.0);
 
     @override
@@ -49,8 +50,43 @@ class _MyHomePageState extends State<MyHomePage> {
         return Scaffold(
             appBar: AppBar(
                 title: Text(widget.title),
+                actions: <Widget>[
+                    new IconButton(icon: const Icon(Icons.list), onPressed: _pushSaved),
+                ],
             ),
             body: _buildSuggestions(),
+        );
+    }
+
+    void _pushSaved() {
+        Navigator.of(context).push(
+            new MaterialPageRoute<void>(
+                builder: (BuildContext context) {
+                    final Iterable<ListTile> tiles = _saved.map(
+                                (User user) {
+                            return new ListTile(
+                                title: new Text(
+                                    user.last_name + ' ' + user.first_name,
+                                    style: _biggerFont,
+                                ),
+                            );
+                        },
+                    );
+                    final List<Widget> divided = ListTile
+                            .divideTiles(
+                        context: context,
+                        tiles: tiles,
+                    )
+                            .toList();
+
+                    return new Scaffold(
+                        appBar: new AppBar(
+                            title: const Text('Saved Suggestions'),
+                        ),
+                        body: new ListView(children: divided),
+                    );
+                },
+            ),
         );
     }
 
@@ -71,10 +107,15 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     Widget _buildRow(User user) {
+        final bool alreadySaved = _saved.contains(user);
         return ListTile(
             title: Text(
                 user.last_name + ' ' + user.first_name,
                 style: _biggerFont,
+            ),
+            trailing: new Icon(
+                alreadySaved ? Icons.star : Icons.star_border,
+                color: alreadySaved ? Colors.yellow : null,
             ),
             onTap: () {
                 Navigator.push(
@@ -83,6 +124,15 @@ class _MyHomePageState extends State<MyHomePage> {
                         builder: (context) => DetailScreen(user: user),
                     ),
                 );
+            },
+            onLongPress: (){
+                setState(() {
+                    if (alreadySaved) {
+                        _saved.remove(user);
+                    } else {
+                        _saved.add(user);
+                    }
+                });
             },
         );
     }
@@ -114,18 +164,16 @@ Future<List<User>> loadData() async {
 }
 
 class DetailScreen extends StatelessWidget {
-    // Declare a field that holds the Todo
     final User user;
 
-    // In the constructor, require a Todo
     DetailScreen({Key key, @required this.user}) : super(key: key);
 
     @override
     Widget build(BuildContext context) {
-        // Use the Todo to create our UI
         return Scaffold(
             appBar: AppBar(
                 title: Text("${user.first_name} ${user.last_name}"),
+
             ),
             body: Padding(
                 padding: EdgeInsets.all(16.0),
