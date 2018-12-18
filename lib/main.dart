@@ -76,6 +76,14 @@ class _MyHomePageState extends State<MyHomePage> {
                 user.last_name + ' ' + user.first_name,
                 style: _biggerFont,
             ),
+            onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => DetailScreen(user: user),
+                    ),
+                );
+            },
         );
     }
 }
@@ -102,5 +110,27 @@ Future<List<User>> loadData() async {
     } catch (e) {
         print(e);
         return new List();
+    }
+}
+
+class DetailScreen extends StatelessWidget {
+    // Declare a field that holds the Todo
+    final User user;
+
+    // In the constructor, require a Todo
+    DetailScreen({Key key, @required this.user}) : super(key: key);
+
+    @override
+    Widget build(BuildContext context) {
+        // Use the Todo to create our UI
+        return Scaffold(
+            appBar: AppBar(
+                title: Text("${user.first_name} ${user.last_name}"),
+            ),
+            body: Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Text('usename: ${user.username}\nemail: ${user.email}'),
+            ),
+        );
     }
 }
