@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert' as JSON;
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
@@ -7,15 +8,24 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'data.dart';
 import 'user.dart';
 
+import 'package:path_provider/path_provider.dart';
+
 Future<void> main() async {
-    var list = await loadData();
-    DataHolder.users = list;
+    DataHolder.users = await loadData();
+    DataHolder.localPath = await localPath();
     runApp(MyApp());
 }
 
 class DataHolder {
     static List<User> users;
+    static String localPath;
 }
+
+Future<String> localPath() async {
+    final directory = await getApplicationDocumentsDirectory();
+    return directory.path;
+}
+
 
 class MyApp extends StatelessWidget {
     @override
@@ -125,7 +135,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                 );
             },
-            onLongPress: (){
+            onLongPress: () {
                 setState(() {
                     if (alreadySaved) {
                         _saved.remove(user);
@@ -176,8 +186,22 @@ class DetailScreen extends StatelessWidget {
 
             ),
             body: Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Text('usename: ${user.username}\nemail: ${user.email}'),
+                padding: EdgeInsets.only(left: 8.0, top: 12.0),
+                child: Column(
+                    children: <Widget>[
+                        SizedBox(
+                            width: double.infinity,
+                            child: Text('usename: ${user.username}',),
+                        ),
+                        Divider(height: 8.0,),
+                        SizedBox(
+                            width: double.infinity,
+                            child: Text('email: ${user.email}'),
+                        ),
+                        Divider(),
+                        Image.asset('assets/anonymous.png'),
+                    ],
+                ),
             ),
         );
     }
