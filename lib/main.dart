@@ -59,40 +59,28 @@ class _MyHomePageState extends State<MyHomePage> {
         return Scaffold(
             appBar: AppBar(
                 title: Text(widget.title),
-                actions: <Widget>[
-                    new IconButton(icon: const Icon(Icons.list), onPressed: _pushSaved),
-                ],
             ),
             body: _buildSuggestions(),
             drawer: Drawer(
-                // Add a ListView to the drawer. This ensures the user can scroll
-                // through the options in the Drawer if there isn't enough vertical
-                // space to fit everything.
                 child: ListView(
-                    // Important: Remove any padding from the ListView.
                     padding: EdgeInsets.zero,
                     children: <Widget>[
                         DrawerHeader(
-                            child: Text('Drawer Header'),
+                            child: Text('Quick access'),
                             decoration: BoxDecoration(
                                 color: Colors.blue,
                             ),
                         ),
+                        Divider(),
                         ListTile(
-                            title: Text('Item 1'),
+                            title: Text('Favorite users'),
                             onTap: () {
-                                // Update the state of the app
-                                // ...
-                                // Then close the drawer
-                                Navigator.pop(context);
+                                pushSaved();
                             },
                         ),
                         ListTile(
                             title: Text('Item 2'),
                             onTap: () {
-                                // Update the state of the app
-                                // ...
-                                // Then close the drawer
                                 Navigator.pop(context);
                             },
                         ),
@@ -102,7 +90,7 @@ class _MyHomePageState extends State<MyHomePage> {
         );
     }
 
-    void _pushSaved() {
+    void pushSaved() {
         Navigator.of(context).push(
             new MaterialPageRoute<void>(
                 builder: (BuildContext context) {
