@@ -1,10 +1,9 @@
 import 'dart:async';
 
 import 'package:comrade_app/detail.dart';
+import 'package:comrade_app/json/user.dart';
 import 'package:comrade_app/settings.dart';
 import 'package:flutter/material.dart';
-
-import 'package:comrade_app/json/user.dart';
 
 Future<void> main() async {
     await Settings.init();
@@ -59,7 +58,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         ListTile(
                             title: Text('Favorite users'),
                             onTap: () {
-                                pushSaved();
+                                favoriteUsers();
                             },
                         ),
                     ],
@@ -68,18 +67,19 @@ class _MyHomePageState extends State<MyHomePage> {
         );
     }
 
-    void pushSaved() {
+    void favoriteUsers() {
         Navigator.of(context).push(
             new MaterialPageRoute<void>(
                 builder: (BuildContext context) {
                     final Iterable<ListTile> tiles = _favorites.map(
                                 (String username) {
-                                    User user = Settings.userMap[username];
+                            User user = Settings.userMap[username];
                             return new ListTile(
                                 title: new Text(
                                     "${user.last_name} ${user.first_name}",
                                     style: _biggerFont,
                                 ),
+                                onTap: toDetailScreen(user),
                             );
                         },
                     );
@@ -97,6 +97,17 @@ class _MyHomePageState extends State<MyHomePage> {
                 },
             ),
         );
+    }
+
+    Function toDetailScreen(User user) {
+        return () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => DetailScreen(user: user),
+                ),
+            );
+        };
     }
 
     Widget _buildSuggestions() {
@@ -126,14 +137,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 alreadySaved ? Icons.star : Icons.star_border,
                 color: alreadySaved ? Colors.yellow : null,
             ),
-            onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => DetailScreen(user: user),
-                    ),
-                );
-            },
+            onTap: toDetailScreen(user),
             onLongPress: () {
                 setState(() {
                     if (alreadySaved) {
