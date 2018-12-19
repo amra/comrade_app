@@ -1,4 +1,4 @@
-import 'user.dart';
+import 'package:comrade_app/json/user.dart';
 
 class Data {
     List<User> colleges;

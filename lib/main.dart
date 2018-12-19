@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:path_provider/path_provider.dart';
 
-import 'data.dart';
-import 'user.dart';
+import 'package:comrade_app/json/data.dart';
+import 'package:comrade_app/json/user.dart';
 
 Future<void> main() async {
     DataHolder.users = await loadData();

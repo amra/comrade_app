@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'user.dart';
+import 'package:comrade_app/json/user.dart';
 
 class DetailScreen extends StatelessWidget {
     final User user;
