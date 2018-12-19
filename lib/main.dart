@@ -1,30 +1,15 @@
 import 'dart:async';
-import 'dart:convert' as JSON;
 
 import 'package:comrade_app/detail.dart';
+import 'package:comrade_app/settings.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show rootBundle;
-import 'package:path_provider/path_provider.dart';
 
-import 'package:comrade_app/json/data.dart';
 import 'package:comrade_app/json/user.dart';
 
 Future<void> main() async {
-    DataHolder.users = await loadData();
-    DataHolder.localPath = await localPath();
+    await Settings.init();
     runApp(MyApp());
 }
-
-class DataHolder {
-    static List<User> users;
-    static String localPath;
-}
-
-Future<String> localPath() async {
-    final directory = await getApplicationDocumentsDirectory();
-    return directory.path;
-}
-
 
 class MyApp extends StatelessWidget {
     @override
@@ -49,9 +34,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-//    List<User> _users = DataHolder.users;
-    final _users = DataHolder.users;
-    final Set<User> _saved = new Set<User>();
+    final _users = Settings.users;
+    final Set<String> _favorites = Settings.favorites;
     final _biggerFont = const TextStyle(fontSize: 18.0);
 
     @override
@@ -78,12 +62,6 @@ class _MyHomePageState extends State<MyHomePage> {
                                 pushSaved();
                             },
                         ),
-                        ListTile(
-                            title: Text('Item 2'),
-                            onTap: () {
-                                Navigator.pop(context);
-                            },
-                        ),
                     ],
                 ),
             ),
@@ -94,11 +72,12 @@ class _MyHomePageState extends State<MyHomePage> {
         Navigator.of(context).push(
             new MaterialPageRoute<void>(
                 builder: (BuildContext context) {
-                    final Iterable<ListTile> tiles = _saved.map(
-                                (User user) {
+                    final Iterable<ListTile> tiles = _favorites.map(
+                                (String username) {
+                                    User user = Settings.userMap[username];
                             return new ListTile(
                                 title: new Text(
-                                    user.last_name + ' ' + user.first_name,
+                                    "${user.last_name} ${user.first_name}",
                                     style: _biggerFont,
                                 ),
                             );
@@ -108,12 +87,10 @@ class _MyHomePageState extends State<MyHomePage> {
                             .divideTiles(
                         context: context,
                         tiles: tiles,
-                    )
-                            .toList();
-
+                    ).toList();
                     return new Scaffold(
                         appBar: new AppBar(
-                            title: const Text('Saved Suggestions'),
+                            title: const Text('Favorite users'),
                         ),
                         body: new ListView(children: divided),
                     );
@@ -139,7 +116,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     Widget _buildRow(User user) {
-        final bool alreadySaved = _saved.contains(user);
+        final bool alreadySaved = _favorites.contains(user.username);
         return ListTile(
             title: Text(
                 user.last_name + ' ' + user.first_name,
@@ -160,37 +137,13 @@ class _MyHomePageState extends State<MyHomePage> {
             onLongPress: () {
                 setState(() {
                     if (alreadySaved) {
-                        _saved.remove(user);
+                        _favorites.remove(user.username);
                     } else {
-                        _saved.add(user);
+                        _favorites.add(user.username);
                     }
+                    Settings.saveSettings();
                 });
             },
         );
-    }
-}
-
-Future<String> getFileData(String path) async {
-    return await rootBundle.loadString(path);
-}
-
-Future<List<User>> loadData() async {
-    try {
-        String contents = await getFileData('data/data.json');
-
-        final json = JSON.json.decode(contents);
-        Data data = Data.fromJson(json);
-        print("data: " + data.colleges.length.toString());
-
-        data.colleges.sort((user1, user2) {
-            if (user1.last_name == user2.last_name) {
-                return user1.first_name.compareTo(user2.first_name);
-            }
-            return user1.last_name.compareTo(user2.last_name);
-        });
-        return data.colleges;
-    } catch (e) {
-        print(e);
-        return new List();
     }
 }
