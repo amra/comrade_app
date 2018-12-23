@@ -2,11 +2,11 @@ import 'dart:async';
 
 import 'package:comrade_app/detail.dart';
 import 'package:comrade_app/json/user.dart';
-import 'package:comrade_app/settings.dart';
+import 'package:comrade_app/storage.dart';
 import 'package:flutter/material.dart';
 
 Future<void> main() async {
-    await Settings.init();
+    await Storage.init(await PathStorage.create());
     runApp(MyApp());
 }
 
@@ -33,8 +33,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-    final _users = Settings.users;
-    final Set<String> _favorites = Settings.favorites;
+    final _users = Storage.users;
+    final Set<String> _favorites = Storage.favorites;
     final _biggerFont = const TextStyle(fontSize: 18.0);
 
     @override
@@ -73,7 +73,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 builder: (BuildContext context) {
                     final Iterable<ListTile> tiles = _favorites.map(
                                 (String username) {
-                            User user = Settings.userMap[username];
+                            User user = Storage.userMap[username];
                             return new ListTile(
                                 title: new Text(
                                     "${user.last_name} ${user.first_name}",
@@ -111,6 +111,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     Widget _buildSuggestions() {
+//        print("users: ${_users.length}");
         return ListView.builder(
                 padding: const EdgeInsets.all(16.0),
                 itemBuilder: (context, i) {
@@ -145,7 +146,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     } else {
                         _favorites.add(user.username);
                     }
-                    Settings.saveSettings();
+                    Storage.saveSettings();
                 });
             },
         );
