@@ -43,7 +43,7 @@ class _MyHomePageState extends State<MyHomePage> {
             appBar: AppBar(
                 title: Text(widget.title),
             ),
-            body: _buildSuggestions(),
+            body: Scrollbar(child:_buildUsers()),
             drawer: Drawer(
                 child: ListView(
                     padding: EdgeInsets.zero,
@@ -58,7 +58,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         ListTile(
                             title: Text('Favorite users'),
                             onTap: () {
-                                favoriteUsers();
+                                _favoriteUsers();
                             },
                         ),
                     ],
@@ -67,7 +67,7 @@ class _MyHomePageState extends State<MyHomePage> {
         );
     }
 
-    void favoriteUsers() {
+    void _favoriteUsers() {
         Navigator.of(context).push(
             new MaterialPageRoute<void>(
                 builder: (BuildContext context) {
@@ -79,7 +79,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                     "${user.last_name} ${user.first_name}",
                                     style: _biggerFont,
                                 ),
-                                onTap: toDetailScreen(user),
+                                onTap: _toDetailScreen(user),
                             );
                         },
                     );
@@ -99,7 +99,7 @@ class _MyHomePageState extends State<MyHomePage> {
         );
     }
 
-    Function toDetailScreen(User user) {
+    Function _toDetailScreen(User user) {
         return () {
             Navigator.push(
                 context,
@@ -110,7 +110,7 @@ class _MyHomePageState extends State<MyHomePage> {
         };
     }
 
-    Widget _buildSuggestions() {
+    Widget _buildUsers() {
 //        print("users: ${_users.length}");
         return ListView.builder(
                 padding: const EdgeInsets.all(16.0),
@@ -138,7 +138,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 alreadySaved ? Icons.star : Icons.star_border,
                 color: alreadySaved ? Colors.yellow : null,
             ),
-            onTap: toDetailScreen(user),
+            onTap: _toDetailScreen(user),
             onLongPress: () {
                 setState(() {
                     if (alreadySaved) {
