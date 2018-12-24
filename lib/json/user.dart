@@ -3,14 +3,28 @@ class User extends Comparable<User> {
     final String first_name;
     final String last_name;
     final String email;
+    final String phone;
+    final String company;
+    final String department;
+    final String location;
+    final String workforce_id;
+    final String cost_center;
 
-    User({this.username = "", this.first_name = "", this.last_name = "", this.email = ""});
+    User({this.username = "", this.first_name = "", this.last_name = "", this.email = "", this.phone = "", this.company = "", this.department = "",
+        this.location = "", this.workforce_id = "", this.cost_center = ""});
 
     User.fromJson(Map<String, dynamic> json)
             : username = json['username'],
                 first_name = json['first_name'] ?? "",
                 last_name = json['last_name'] ?? "",
-                email = json['email'] ?? "";
+                email = json['email'] ?? "",
+                phone = json['phone'] ?? "",
+                company = json['company'] ?? "",
+                department = json['department'] ?? "",
+                location = json['location'] ?? "",
+                workforce_id = json['workforce_id'] ?? "",
+                cost_center = json['cost_center'] ?? ""
+    ;
 
     Map<String, dynamic> toJson() =>
             {
@@ -18,6 +32,12 @@ class User extends Comparable<User> {
                 'first_name': first_name,
                 'last_name': last_name,
                 'email': email,
+                'phone': phone,
+                'company': company,
+                'department': department,
+                'location': location,
+                'workforce_id': workforce_id,
+                'cost_center': cost_center,
             };
 
     @override

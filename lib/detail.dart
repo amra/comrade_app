@@ -20,12 +20,42 @@ class DetailScreen extends StatelessWidget {
                     children: <Widget>[
                         SizedBox(
                             width: double.infinity,
-                            child: Text('usename: ${user.username}',),
+                            child: Text('Usename: ${user.username}',),
                         ),
                         Divider(height: 8.0,),
                         SizedBox(
                             width: double.infinity,
-                            child: Text('email: ${user.email}'),
+                            child: Text('Email: ${user.email}'),
+                        ),
+                        Divider(height: 8.0,),
+                        SizedBox(
+                            width: double.infinity,
+                            child: Text('Phone: ${user.phone}'),
+                        ),
+                        Divider(height: 8.0,),
+                        SizedBox(
+                            width: double.infinity,
+                            child: Text('Company: ${user.company}'),
+                        ),
+                        Divider(height: 8.0,),
+                        SizedBox(
+                            width: double.infinity,
+                            child: Text('Department: ${user.department}'),
+                        ),
+                        Divider(height: 8.0,),
+                        SizedBox(
+                            width: double.infinity,
+                            child: Text('Location: ${user.location}'),
+                        ),
+                        Divider(height: 8.0,),
+                        SizedBox(
+                            width: double.infinity,
+                            child: Text('Workforce id: ${user.workforce_id}'),
+                        ),
+                        Divider(height: 8.0,),
+                        SizedBox(
+                            width: double.infinity,
+                            child: Text('Cost center: ${user.cost_center}'),
                         ),
                         Divider(),
                         Image.asset('assets/anonymous.png'),
