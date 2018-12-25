@@ -73,7 +73,7 @@ class PathStorage {
             pathStorage._localPath = await pathStorage._getLocalPath();
         }
 
-        pathStorage._configJsonFile = File('${localPath}/config.json');
+        pathStorage._configJsonFile = File('${pathStorage._localPath}/config.json');
 
         pathStorage._dataPath = pathStorage._localPath + '/data/data.json';
         return pathStorage;
