@@ -22,6 +22,7 @@ dependencies:
   path_provider: ^0.4.1
   english_words: ^3.1.0
   json_annotation: ^2.0.0
+  draggable_scrollbar: ^0.0.4
 
 dev_dependencies:
   flutter_test:
