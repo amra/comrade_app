@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:comrade_app/detail.dart';
 import 'package:comrade_app/json/user.dart';
 import 'package:comrade_app/storage.dart';
-import 'package:flutter/material.dart';
 import 'package:draggable_scrollbar/draggable_scrollbar.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 Future<void> main() async {
     await Storage.init(await PathStorage.create());
@@ -64,10 +66,30 @@ class _MyHomePageState extends State<MyHomePage> {
                                 _favoriteUsers();
                             },
                         ),
+                        Divider(),
+                        ListTile(
+                            title: Text('Import data'),
+                            onTap: _getFilePath,
+                        ),
                     ],
                 ),
             ),
         );
+    }
+
+    void _getFilePath() async {
+        try {
+            String filePath = await FilePicker.getFilePath(type: FileType.ANY);
+            if (filePath == '') {
+                return;
+            }
+            print("File path: " + filePath);
+            setState(() {
+                Storage.importData(filePath);
+            });
+        } on PlatformException catch (e) {
+            print("Error while picking the file: " + e.toString());
+        }
     }
 
     void _favoriteUsers() {
@@ -114,9 +136,27 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     Widget _buildUsers() {
+        if (_users.length == 0) {
+            return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                    new Center(
+                        child: new Text('No file selected.'),
+                    ),
+                    Divider(),
+                    FloatingActionButton(
+                        onPressed: _getFilePath,
+                        tooltip: 'Select file',
+                        child: new Icon(Icons.sd_storage),
+                    )
+                ],
+            );
+        }
         return DraggableScrollbar.semicircle(
                 alwaysVisibleScrollThumb: true,
                 labelTextBuilder: (offset) {
+                    if (_users.length == 0) return null;
                     int numItems = _users.length - 1;
                     final int currentItem = controller.hasClients ? (controller.offset / controller.position.maxScrollExtent * numItems) .floor() : 0;
                     var text = _users[currentItem].last_name;

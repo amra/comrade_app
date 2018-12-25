@@ -58,12 +58,19 @@ class Storage {
         print('saving config: ${jsonToSave}');
         pathStorage.configJson.writeAsStringSync(jsonToSave);
     }
+
+    static void importData(String filePath) {
+        //TODO: validate json file
+        File(filePath).copySync(pathStorage._localPath + '/data.json');
+        loadUsers();
+    }
 }
 
 class PathStorage {
-    String _localPath;
-    String _dataPath;
-    File _configJsonFile;
+    String _localPath;      // Application data directory.
+
+    String _dataPath;       // Data file full path.
+    File _configJsonFile;   // Local configuration file.
 
     static Future<PathStorage> create([String localPath]) async {
         var pathStorage = new PathStorage();
@@ -75,7 +82,7 @@ class PathStorage {
 
         pathStorage._configJsonFile = File('${pathStorage._localPath}/config.json');
 
-        pathStorage._dataPath = pathStorage._localPath + '/data/data.json';
+        pathStorage._dataPath = pathStorage._localPath + '/data.json';
         return pathStorage;
     }
 
@@ -83,10 +90,6 @@ class PathStorage {
         if (File(_dataPath).existsSync()) {
             print('loadData() file');
             return File(_dataPath).readAsStringSync();
-        }
-        if (await assetExists('data/data.json')) {
-            print('loadData() bundle');
-            return rootBundle.loadString('data/data.json');
         }
         print('loadData() none');
         return '';
@@ -96,15 +99,6 @@ class PathStorage {
         // Ok to load it, because it will be cached and is guaranteed to be used later anyways
         return rootBundle.load(asset).then((_) => true).catchError(() => false);
     }
-
-//    static Future<String> getFileData(String path) async {
-//        return await rootBundle.loadString(path);
-//    }
-//
-//    static Future<String> getLocalPath() async {
-//        final directory = await getApplicationDocumentsDirectory();
-//        return directory.path;
-//    }
 
     String get localPath => _localPath;
     File get configJson => _configJsonFile;
