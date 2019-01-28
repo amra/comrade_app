@@ -1,0 +1,16 @@
+{
+    "colleges": [
+        {
+            "username": "smurfette",
+            "first_name": "Smurfette",
+            "last_name": "Smurfs",
+            "email": "smurfette@smurf-village.fr",
+            "phone": "321654987",
+            "company": "Smurf",
+            "department": "Village",
+            "location": "France",
+            "workforce_id": "11111",
+            "cost_center": "22222"
+        }
+    ]
+}

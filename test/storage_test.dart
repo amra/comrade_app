@@ -13,4 +13,12 @@ void main() {
         expect(Storage.users, isNotNull);
         expect(Storage.users.length, equals(377));
     });
+
+    test('Unzip data', () async {
+        PathStorage pathStorage = await PathStorage.create(Directory.current.path + '/test/data');
+        print('---');
+        print(pathStorage);
+        await Storage.importData(pathStorage.dataPath);
+
+    });
 }

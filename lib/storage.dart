@@ -1,6 +1,10 @@
 import 'dart:convert' as JSON;
 import 'dart:io';
 
+import 'package:archive/archive.dart';
+import 'package:archive/archive_io.dart';
+
+
 import 'package:comrade_app/json/config.dart';
 import 'package:comrade_app/json/data.dart';
 import 'package:comrade_app/json/user.dart';
@@ -61,7 +65,31 @@ class Storage {
 
     static void importData(String filePath) {
         //TODO: validate json file
-        File(filePath).copySync(pathStorage._localPath + '/data.json');
+        if (filePath.endsWith(".zip")) {
+            print("import file: zip");
+            List<int> bytes = new File(filePath).readAsBytesSync();
+
+            // Decode the Zip file
+            Archive archive = new ZipDecoder().decodeBytes(bytes);
+            print("zip content" + archive.toString());
+
+            // Extract the contents of the Zip archive to disk.
+            for (ArchiveFile file in archive) {
+                String filename = file.name;
+                if (file.isFile) {
+                    List<int> data = file.content;
+                    new File(pathStorage._localPath + '/' + filename)
+                        ..createSync(recursive: true)
+                        ..writeAsBytesSync(data);
+                } else {
+                    new Directory(pathStorage._localPath + '/' + filename)
+                        ..create(recursive: true);
+                }
+            }
+        } else {
+            print("import file: json");
+            File(filePath).copySync(pathStorage._localPath + '/data.json');
+        }
         loadUsers();
     }
 }
@@ -82,7 +110,14 @@ class PathStorage {
 
         pathStorage._configJsonFile = File('${pathStorage._localPath}/config.json');
 
-        pathStorage._dataPath = pathStorage._localPath + '/data.json';
+        String testZip = pathStorage._localPath + '/data.zip';
+        String testJson = pathStorage._localPath + '/data.json';
+
+        if (File(testZip).existsSync()) {
+            pathStorage._dataPath = testZip;
+        } else if (File(testJson).existsSync()) {
+            pathStorage._dataPath = testJson;
+        }
         return pathStorage;
     }
 
@@ -112,6 +147,11 @@ class PathStorage {
             print(e);
             return '.';
         }
+    }
+
+    @override
+    String toString() {
+        return "PathStorage{\n    _localPath: '$_localPath', \n    _dataPath: '$_dataPath', \n    _configJsonFile: ${_configJsonFile.toString()}\n}";
     }
 
 
